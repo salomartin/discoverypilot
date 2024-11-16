@@ -1,0 +1,55 @@
+{
+  "name": "discoverypilot",
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix vite:build",
+    "deploy": "wrangler pages deploy ./build/client",
+    "dev:remix": "remix vite:dev --host",
+    "dev:agent": "wrangler pages dev ./build/client",
+    "dev": "concurrently --names remix,agent --prefix \"[{time} {name}]\" --prefix-colors \"auto\" \"bun run dev:remix\" \"bun run typegen && bun run build && bun run dev:agent\"",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "typecheck": "tsc",
+    "typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@openai/realtime-api-beta": "openai/openai-realtime-api-beta",
+    "@remix-run/cloudflare": "^2.14.0",
+    "@remix-run/cloudflare-pages": "^2.14.0",
+    "@remix-run/react": "^2.14.0",
+    "isbot": "^5.1.17",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remix-utils": "^7.7.0",
+    "wavtools": "^0.1.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241112.0",
+    "@remix-run/dev": "^2.14.0",
+    "@remix-run/fs-routes": "^2.14.0",
+    "@remix-run/route-config": "^2.14.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.14.0",
+    "@typescript-eslint/parser": "^8.14.0",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.15.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "openai-realtime-console": "https://github.com/openai/openai-realtime-console",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-tsconfig-paths": "^5.1.2",
+    "wrangler": "3.87.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

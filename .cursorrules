@@ -1,0 +1,4 @@
+We're using bun as our package manager.
+It's a remix run project using vite and cloudflare pages.
+Leverage all the core principles of remix (basically react router) with loaders, actions and client and server side separation.
+Use fullstack data flow, server vs client code execution, react router, progressive enhancement, pending ui, form vs fetcher.
