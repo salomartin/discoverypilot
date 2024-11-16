@@ -1,0 +1,10 @@
+.voice-visualizer {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.bar {
+    stroke: blue;
+    /*  transition: height 0.1s ease, y 0.1s ease, stroke 0.2s ease; Adjusted transition timings */
+}

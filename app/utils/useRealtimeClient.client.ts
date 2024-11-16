@@ -35,7 +35,7 @@ interface ConversationItem {
 }
 
 export function useRealtimeClient(
-  startTimeRef: React.RefObject<string>,
+  startTimeRef: React.MutableRefObject<string>,
   setRealtimeEvents: React.Dispatch<React.SetStateAction<RealtimeEvent[]>>,
   wavStreamPlayerRef: React.RefObject<any>,
   wavRecorderRef: React.RefObject<any>,
@@ -68,7 +68,7 @@ export function useRealtimeClient(
         console.log('Connected successfully');
 
         // Listen for session updates
-        client.on('session.updated', (session) => {
+        client.on('session.updated', (session: any) => {
           console.log('Session updated:', session);
           // Handle session updates if necessary
         });

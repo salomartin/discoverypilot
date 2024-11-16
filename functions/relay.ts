@@ -12,12 +12,12 @@ const OPENAI_URL = "wss://api.openai.com/v1/realtime";
 
 function owrLog(...args: unknown[]) {
   if (DEBUG) {
-    console.log("[owr]", ...args);
+    console.log(...args);
   }
 }
 
 function owrError(...args: unknown[]) {
-  console.error("[owr error]", ...args);
+  console.error(...args);
 }
 
 export async function createRealtimeClient(request: Request, apiKey: string) {

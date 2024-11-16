@@ -10,3 +10,5 @@ node_modules
 .dev.vars
 
 .DS_Store
+
+/coverage

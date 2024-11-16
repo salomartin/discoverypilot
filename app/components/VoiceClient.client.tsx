@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RealtimeEvent } from '../utils/useRealtimeClient.client';
 import { useRealtimeClient } from '../utils/useRealtimeClient.client';
 import { WavRecorder, WavStreamPlayer } from 'wavtools';
+import { VoiceVisualizer } from './VoiceVisualizer';
 
 const STORAGE_KEY = 'voice_client_memory';
 
@@ -22,10 +23,10 @@ export default function VoiceClient() {
     }
   }, [memoryKv]);
 
-  const wavRecorderRef = useRef<any>(
+  const wavRecorderRef = useRef<WavRecorder>(
     new WavRecorder({ sampleRate: 24000 })
   );
-  const wavStreamPlayerRef = useRef<any>(
+  const wavStreamPlayerRef = useRef<WavStreamPlayer>(
     new WavStreamPlayer({ sampleRate: 24000 })
   );
 
@@ -104,7 +105,7 @@ export default function VoiceClient() {
         <div className="flex items-center space-x-4">
           <button
             onClick={handleConnectionToggle}
-            className={`flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] px-6 min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer px-4 py-2 rounded-md ${
+            className={`flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer px-4 ${
               isConnected
                 ? 'bg-red-500 hover:bg-red-600 text-white'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
@@ -118,7 +119,7 @@ export default function VoiceClient() {
           {isConnected && (
             <span className="flex space-x-2">
               <button
-                className="flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] px-6 min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer bg-[#101010] text-[#ececf1] hover:enabled:bg-[#404040]"
+                className="flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer bg-[#101010] text-[#ececf1] hover:enabled:bg-[#404040]"
                 onClick={() => client.createResponse()}
               >
                 Force Reply
@@ -140,6 +141,18 @@ export default function VoiceClient() {
 
       <div className="overflow-auto flex-1">
         <div className="flex flex-col h-full md:flex-row">
+          <div className="overflow-auto flex-1 border-r border-gray-200">
+            <div className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4 max-w-[100%]">
+                <div className="flex-1">
+                  <VoiceVisualizer wavRef={wavRecorderRef} />
+                </div>
+                <div className="flex-1">
+                  <VoiceVisualizer wavRef={wavStreamPlayerRef} />
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="overflow-auto w-full md:w-96">
             <div className="p-4">
               <div className="mb-4">

@@ -27,6 +27,12 @@ bun run typegen
 
 You will need to rerun typegen whenever you make changes to `wrangler.toml`.
 
+## Testing
+
+```sh
+bun test
+```
+
 ## Deployment
 
 First, build your app for production:
@@ -55,6 +61,28 @@ This template comes with [Tailwind CSS](https://tailwindcss.com/) already config
 
 
 ## TODO
+
+
+MVP
+    add voice viz
+    add shadcn based ui with easy brand overrides
+    add varying greeting texts
+    add saving of transcriptions and recordings of conversations
+----
+    add some screener? or keep it panel side?
+
+    add some sort of sampling capture (ie from Cint panels) and redirect back to panel
+
+    at end of interview ask some contact details?
+----
+    add prompt generator to design proper prompts (based on cli for devs?)
+        input from product interview sources
+        use openai reference prompt
+
+Later
+
+
+
 - [ ] Add authentication to the relay endpoint
 - [ ] Add rate limiting
 - [ ] Add error handling and retries for WebSocket connections
