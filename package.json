@@ -9,7 +9,7 @@
     "dev:remix": "remix vite:dev --host",
     "dev:agent": "wrangler pages dev ./build/client",
     "dev": "concurrently --names remix,agent --prefix \"[{time} {name}]\" --prefix-colors \"auto\" \"bun run dev:remix\" \"bun run typegen && bun run build && bun run dev:agent\"",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "lint": "eslint --flag unstable_ts_config --cache --cache-location ./node_modules/.cache/eslint .",
     "typecheck": "tsc",
     "typegen": "wrangler types"
   },
@@ -46,6 +46,8 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-remix": "^1.1.1",
+    "jiti": "^2.4.0",
     "openai-realtime-console": "https://github.com/openai/openai-realtime-console",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
