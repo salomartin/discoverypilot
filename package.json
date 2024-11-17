@@ -16,6 +16,7 @@
   "dependencies": {
     "@openai/realtime-api-beta": "openai/openai-realtime-api-beta",
     "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@remix-run/cloudflare": "^2.14.0",
     "@remix-run/cloudflare-pages": "^2.14.0",
@@ -27,9 +28,11 @@
     "framer-motion": "^11.11.17",
     "isbot": "^5.1.17",
     "lucide-react": "^0.460.0",
+    "next-themes": "^0.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remix-utils": "^7.7.0",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "wavtools": "^0.1.5"

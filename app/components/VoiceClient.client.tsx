@@ -4,10 +4,13 @@ import { useRealtimeClient } from "../utils/useRealtimeClient.client";
 import { WavRecorder, WavStreamPlayer } from "wavtools";
 import { VoiceVisualizer } from "./VoiceVisualizer";
 import { motion, AnimatePresence } from "framer-motion";
-import { AudioLines, Loader2, X, Mic, MicOff } from "lucide-react";
+import { AudioLines, Loader2, X, Mic, MicOff, Settings } from "lucide-react";
 import { AGENT_INFO } from "content/frontend";
 import { Button } from "./ui/button";
 import { RealtimeEventsDisplay } from "./RealtimeEventsDisplay";
+import { AudioDeviceControls } from "./AudioDeviceControls";
+import { Alert, AlertDescription } from "./ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const STORAGE_KEY = "voice_client_memory";
 
@@ -84,6 +87,7 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
   );
 
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [showAudioControls, setShowAudioControls] = useState(false);
 
   const handleConnectionToggle = async () => {
     try {
@@ -107,9 +111,21 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
 
   return (
     <div className="w-full max-w-md relative">
-      {connectionError && (
-        <span className="text-red-500 text-sm">{connectionError}</span>
-      )}
+      <AnimatePresence mode="wait">
+        {connectionError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-0 left-0 right-0 z-50"
+          >
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{connectionError}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isConnected && (
         <>
@@ -121,6 +137,15 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
           />
         </>
       )}
+
+      <AudioDeviceControls
+        open={showAudioControls}
+        onOpenChange={setShowAudioControls}
+        wavRecorderRef={wavRecorderRef}
+        wavStreamPlayerRef={wavStreamPlayerRef}
+        isMuted={isMuted}
+        realtimeClient={client}
+      />
 
       <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
         <AnimatePresence mode="wait">
@@ -150,32 +175,33 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
               className="flex items-center space-x-2"
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowAudioControls(!showAudioControls)}
+                className="rounded-full"
               >
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  className={`p-4 rounded-full ${
-                    isMuted
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-[#012854] hover:bg-[#023a7a]"
-                  } text-white transition-colors duration-200`}
-                >
-                  {!isMuted ? (
-                    <Mic className="h-6 w-6" />
-                  ) : (
-                    <MicOff className="h-6 w-6" />
-                  )}
-                </button>
-              </motion.div>
+                <Settings className="h-4 w-4" />
+              </Button>
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className={`p-4 rounded-full ${
+                  isMuted
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-[#012854] hover:bg-[#023a7a]"
+                } text-white transition-colors duration-200`}
+              >
+                {!isMuted ? (
+                  <Mic className="h-6 w-6" />
+                ) : (
+                  <MicOff className="h-6 w-6" />
+                )}
+              </button>
               <div className="w-24 h-12">
                 <VoiceVisualizer wavRef={wavRecorderRef} />
               </div>

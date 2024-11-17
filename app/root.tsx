@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Toaster } from "~/components/ui/sonner"
 
 import "~/tailwind.css";
 
@@ -38,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="mesh-gradient">
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>

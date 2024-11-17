@@ -24,6 +24,8 @@ Some max session length limiter to avoid excess costs
 
 Add some noise reduction worker & plugin (ie krisp or something open source)
 
+Add some timeout if there too much silence from client side, disconnect and / or pause the session server side to not use openai tokens
+
 Later
 
 - [ ] Add authentication to the relay endpoint

@@ -8,8 +8,8 @@ const VoiceClient = lazy(() => import("../components/VoiceClient.client"));
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Realtime Voice Test" },
-    { name: "description", content: "Test realtime voice capabilities" },
+    { title: `Meet ${AGENT_INFO.FULL_NAME}` },
+    { name: "description", content: `Chat with ${AGENT_INFO.SHORT_NAME} about revolutionizing shopping into an investment opportunity. Share your thoughts on making every purchase count!` },
   ];
 };
 
