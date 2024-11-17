@@ -11,7 +11,11 @@ import { RealtimeEventsDisplay } from "./RealtimeEventsDisplay";
 
 const STORAGE_KEY = "voice_client_memory";
 
-export default function VoiceClient() {
+interface VoiceClientProps {
+  onConnectionChange: (isConnected: boolean) => void;
+}
+
+export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
   const startTimeRef = useRef<string>(new Date().toISOString());
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
   const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>(() => {
@@ -97,91 +101,97 @@ export default function VoiceClient() {
     }
   };
 
+  useEffect(() => {
+    onConnectionChange(isConnected);
+  }, [isConnected, onConnectionChange]);
+
   return (
-    <>
+    <div className="w-full max-w-md relative">
       {connectionError && (
         <span className="text-red-500 text-sm">{connectionError}</span>
       )}
 
-      <div className="flex-1">
-        <VoiceVisualizer wavRef={wavStreamPlayerRef} />
-      </div>
+      {isConnected && (
+        <>
+          <VoiceVisualizer wavRef={wavStreamPlayerRef} />
 
-      <RealtimeEventsDisplay 
-        events={realtimeEvents} 
-        startTime={startTimeRef.current} 
-      />
+          <RealtimeEventsDisplay
+            events={realtimeEvents}
+            startTime={startTimeRef.current}
+          />
+        </>
+      )}
 
-      <div className="w-full max-w-md relative">
-        <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
-          <AnimatePresence mode="wait">
-            {!isConnected ? (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 50 }}
-                transition={{ duration: 0.3 }}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
+        <AnimatePresence mode="wait">
+          {!isConnected ? (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Button
+                size="lg"
+                onClick={handleConnectionToggle}
+                className="w-full max-w-[200px] mx-auto py-6 rounded-full bg-[#012854] text-white hover:bg-[#023a7a] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-between px-4 shadow-lg shimmer"
               >
-                <Button
-                  size="lg"
-                  onClick={handleConnectionToggle}
-                  className="w-full max-w-[200px] mx-auto py-6 rounded-full bg-[#012854] text-white hover:bg-[#023a7a] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-between px-4 shadow-lg shimmer"
+                <span className="flex-grow text-center">
+                  {isConnecting
+                    ? "Connecting..."
+                    : `Speak with ${AGENT_INFO.SHORT_NAME}`}
+                </span>
+                {isConnecting ? (
+                  <Loader2 className="h-6 w-6 ml-2 flex-shrink-0 animate-spin" />
+                ) : (
+                  <AudioLines className="h-6 w-6 ml-2 flex-shrink-0" />
+                )}
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center space-x-2"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className={`p-4 rounded-full ${
+                    isMuted
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-[#012854] hover:bg-[#023a7a]"
+                  } text-white transition-colors duration-200`}
                 >
-                  <span className="flex-grow text-center">
-                    {isConnecting ? 'Connecting...' : `Speak with ${AGENT_INFO.SHORT_NAME}`}
-                  </span>
-                  {isConnecting ? (
-                    <Loader2 className="h-6 w-6 ml-2 flex-shrink-0 animate-spin" />
+                  {!isMuted ? (
+                    <Mic className="h-6 w-6" />
                   ) : (
-                    <AudioLines className="h-6 w-6 ml-2 flex-shrink-0" />
+                    <MicOff className="h-6 w-6" />
                   )}
-                </Button>
+                </button>
               </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3 }}
-                className="flex items-center space-x-2"
+              <div className="w-24 h-12">
+                <VoiceVisualizer wavRef={wavRecorderRef} />
+              </div>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+                className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                onClick={handleConnectionToggle}
               >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                >
-                  <button
-                    onClick={() => setIsMuted(!isMuted)}
-                    className={`p-4 rounded-full ${
-                      isMuted
-                        ? "bg-red-600 hover:bg-red-700"
-                        : "bg-[#012854] hover:bg-[#023a7a]"
-                    } text-white transition-colors duration-200`}
-                  >
-                    {!isMuted ? (
-                      <Mic className="h-6 w-6" />
-                    ) : (
-                      <MicOff className="h-6 w-6" />
-                    )}
-                  </button>
-                </motion.div>
-                <div className="w-24 h-12">
-                  <VoiceVisualizer wavRef={wavRecorderRef} />
-                </div>
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                  className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
-                  onClick={handleConnectionToggle}
-                >
-                  <X className="h-6 w-6" />
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <X className="h-6 w-6" />
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </>
+    </div>
   );
 }

@@ -22,6 +22,8 @@ MVP
 Some max session length limiter to avoid excess costs
 
 
+Add some noise reduction worker & plugin (ie krisp or something open source)
+
 Later
 
 - [ ] Add authentication to the relay endpoint
