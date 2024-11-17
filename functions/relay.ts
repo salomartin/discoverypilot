@@ -3,7 +3,7 @@
 
 import { RealtimeClient } from "@openai/realtime-api-beta";
 import { BASE_INSTRUCTIONS } from "content/prompts";
-import { SERVER_TOOLS } from "content/tools";
+import { SERVER_TOOLS } from "content/tools.server";
 
 const DEBUG = true; // set as true to see debug logs
 const MODEL = "gpt-4o-realtime-preview-2024-10-01";

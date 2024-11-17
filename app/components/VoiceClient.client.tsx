@@ -1,24 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RealtimeEvent } from '../utils/useRealtimeClient.client';
-import { useRealtimeClient } from '../utils/useRealtimeClient.client';
-import { WavRecorder, WavStreamPlayer } from 'wavtools';
-import { VoiceVisualizer } from './VoiceVisualizer';
+import { useEffect, useRef, useState } from "react";
+import type { RealtimeEvent } from "../utils/useRealtimeClient.client";
+import { useRealtimeClient } from "../utils/useRealtimeClient.client";
+import { WavRecorder, WavStreamPlayer } from "wavtools";
+import { VoiceVisualizer } from "./VoiceVisualizer";
+import { motion, AnimatePresence } from "framer-motion";
+import { AudioLines, Loader2, X, Mic, MicOff } from "lucide-react";
+import { AGENT_INFO } from "content/frontend";
+import { Button } from "./ui/button";
+import { RealtimeEventsDisplay } from "./RealtimeEventsDisplay";
 
-const STORAGE_KEY = 'voice_client_memory';
+const STORAGE_KEY = "voice_client_memory";
 
 export default function VoiceClient() {
   const startTimeRef = useRef<string>(new Date().toISOString());
   const [realtimeEvents, setRealtimeEvents] = useState<RealtimeEvent[]>([]);
   const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>(() => {
-    if (typeof window === 'undefined') return {};
+    if (typeof window === "undefined") return {};
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {
-      todaysDate: new Date().toISOString().split('T')[0],
-    };
+    return stored
+      ? JSON.parse(stored)
+      : {
+          todaysDate: new Date().toISOString().split("T")[0],
+        };
   });
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryKv));
     }
   }, [memoryKv]);
@@ -30,58 +37,47 @@ export default function VoiceClient() {
     new WavStreamPlayer({ sampleRate: 24000 })
   );
 
-  const { client, isConnected, isMuted, setIsMuted, connectConversation, disconnectConversation } =
-    useRealtimeClient(
-      startTimeRef,
-      setRealtimeEvents,
-      wavStreamPlayerRef,
-      wavRecorderRef,
-      [
-        {
-          schema: {
-            name: 'set_memory',
-            description:
-              'Saves important data about the user into memory. If keys are close, prefer overwriting keys rather than creating new keys.',
-            parameters: {
-              type: 'object',
-              properties: {
-                key: {
-                  type: 'string',
-                  description:
-                    'The key of the memory value. Always use lowercase and underscores, no other characters.',
-                },
-                value: {
-                  type: 'string',
-                  description: 'Value can be anything represented as a string',
-                },
+  const {
+    client,
+    isConnected,
+    isConnecting,
+    isMuted,
+    setIsMuted,
+    connectConversation,
+    disconnectConversation,
+  } = useRealtimeClient(
+    startTimeRef,
+    setRealtimeEvents,
+    wavStreamPlayerRef,
+    wavRecorderRef,
+    [
+      {
+        schema: {
+          name: "set_memory",
+          description:
+            "Saves important data about the user into memory. If keys are close, prefer overwriting keys rather than creating new keys.",
+          parameters: {
+            type: "object",
+            properties: {
+              key: {
+                type: "string",
+                description:
+                  "The key of the memory value. Always use lowercase and underscores, no other characters.",
               },
-              required: ['key', 'value'],
+              value: {
+                type: "string",
+                description: "Value can be anything represented as a string",
+              },
             },
-          },
-          async fn({ key, value }: { key: string; value: string }) {
-            setMemoryKv((prev) => ({ ...prev, [key]: value }));
+            required: ["key", "value"],
           },
         },
-      ]
-    );
-
-  const formatTime = useCallback((timestamp: string) => {
-    const startTime = startTimeRef.current;
-    const t0 = new Date(startTime).valueOf();
-    const t1 = new Date(timestamp).valueOf();
-    const delta = t1 - t0;
-    const hs = Math.floor(delta / 10) % 100;
-    const s = Math.floor(delta / 1000) % 60;
-    const m = Math.floor(delta / 60_000) % 60;
-    const pad = (n: number) => {
-      let s = n + '';
-      while (s.length < 2) {
-        s = '0' + s;
-      }
-      return s;
-    };
-    return `${pad(m)}:${pad(s)}.${pad(hs)}`;
-  }, []);
+        async fn({ key, value }: { key: string; value: string }) {
+          setMemoryKv((prev) => ({ ...prev, [key]: value }));
+        },
+      },
+    ]
+  );
 
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
@@ -94,112 +90,98 @@ export default function VoiceClient() {
         await connectConversation();
       }
     } catch (error) {
-      setConnectionError(error instanceof Error ? error.message : 'Connection failed');
-      console.error('Connection error:', error);
+      setConnectionError(
+        error instanceof Error ? error.message : "Connection failed"
+      );
+      console.error("Connection error:", error);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex flex-none justify-between items-center p-4 border-b border-gray-200">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleConnectionToggle}
-            className={`flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer px-4 ${
-              isConnected
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            {isConnected ? 'Disconnect' : 'Connect'}
-          </button>
-          {connectionError && (
-            <span className="text-red-500 text-sm">{connectionError}</span>
-          )}
-          {isConnected && (
-            <span className="flex space-x-2">
-              <button
-                className="flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer bg-[#101010] text-[#ececf1] hover:enabled:bg-[#404040]"
-                onClick={() => client.createResponse()}
-              >
-                Force Reply
-              </button>
-              <button
-                className={`flex items-center gap-2 font-['Roboto_Mono'] text-xs font-normal border-none rounded-[1000px] px-6 min-h-[42px] transition-all duration-100 outline-none disabled:text-[#999] enabled:cursor-pointer ${
-                  isMuted
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                    : 'bg-[#101010] text-[#ececf1] hover:enabled:bg-[#404040]'
-                }`}
-                onClick={() => setIsMuted(!isMuted)}
-              >
-                {isMuted ? '🔇 Unmute' : '🔊 Mute'}
-              </button>
-            </span>
-          )}
-        </div>
+    <>
+      {connectionError && (
+        <span className="text-red-500 text-sm">{connectionError}</span>
+      )}
+
+      <div className="flex-1">
+        <VoiceVisualizer wavRef={wavStreamPlayerRef} />
       </div>
 
-      <div className="overflow-auto flex-1">
-        <div className="flex flex-col h-full md:flex-row">
-          <div className="overflow-auto flex-1 border-r border-gray-200">
-            <div className="p-4">
-              <div className="flex flex-col sm:flex-row gap-4 max-w-[100%]">
-                <div className="flex-1">
+      <RealtimeEventsDisplay 
+        events={realtimeEvents} 
+        startTime={startTimeRef.current} 
+      />
+
+      <div className="w-full max-w-md relative">
+        <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-[calc(env(safe-area-inset-bottom)+1rem)] px-4">
+          <AnimatePresence mode="wait">
+            {!isConnected ? (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 50 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Button
+                  size="lg"
+                  onClick={handleConnectionToggle}
+                  className="w-full max-w-[200px] mx-auto py-6 rounded-full bg-[#012854] text-white hover:bg-[#023a7a] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold flex items-center justify-between px-4 shadow-lg shimmer"
+                >
+                  <span className="flex-grow text-center">
+                    {isConnecting ? 'Connecting...' : `Speak with ${AGENT_INFO.SHORT_NAME}`}
+                  </span>
+                  {isConnecting ? (
+                    <Loader2 className="h-6 w-6 ml-2 flex-shrink-0 animate-spin" />
+                  ) : (
+                    <AudioLines className="h-6 w-6 ml-2 flex-shrink-0" />
+                  )}
+                </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center space-x-2"
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                >
+                  <button
+                    onClick={() => setIsMuted(!isMuted)}
+                    className={`p-4 rounded-full ${
+                      isMuted
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-[#012854] hover:bg-[#023a7a]"
+                    } text-white transition-colors duration-200`}
+                  >
+                    {!isMuted ? (
+                      <Mic className="h-6 w-6" />
+                    ) : (
+                      <MicOff className="h-6 w-6" />
+                    )}
+                  </button>
+                </motion.div>
+                <div className="w-24 h-12">
                   <VoiceVisualizer wavRef={wavRecorderRef} />
                 </div>
-                <div className="flex-1">
-                  <VoiceVisualizer wavRef={wavStreamPlayerRef} />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="overflow-auto w-full md:w-96">
-            <div className="p-4">
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700">Memory</h3>
-                <pre className="mt-2 text-xs text-wrap">
-                  {JSON.stringify(memoryKv, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-700">
-                  Filtered Events ({realtimeEvents.length})
-                </h3>
-                <div className="overflow-auto mt-2 space-y-2 h-full">
-                  {realtimeEvents.map((event, i) => (
-                    <div
-                      key={i}
-                      className={`text-xs p-2 rounded ${
-                        event.source === 'server' ? 'bg-green-50' : 'bg-blue-50'
-                      }`}
-                    >
-                      <details className="flex justify-between items-center">
-                        <summary className="font-mono">
-                          {formatTime(event.time) + ' '}
-                          <span className="text-xs text-gray-600">
-                            {event.event?.transcript ? (
-                              <p>{`"${event.event.transcript}"`}</p>
-                            ) : event.event?.type === 'response.function_call_arguments.done' && event.event?.name ? (
-                              `${event.event.name}(${event.event.arguments || ''})`
-                            ) : (
-                              <span className="font-mono">
-                                {event.event?.type || 'unknown event'}
-                              </span>
-                            )}
-                          </span>
-                        </summary>
-                        <pre className="overflow-auto mt-2 max-h-40 whitespace-pre-wrap">
-                          {JSON.stringify(event.event, null, 2)}
-                        </pre>
-                      </details>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                  className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                  onClick={handleConnectionToggle}
+                >
+                  <X className="h-6 w-6" />
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </>
   );
-} 
+}

@@ -1,6 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  @apply h-full bg-white dark:bg-gray-950;
+
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -63,4 +73,144 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .mesh-gradient {
+    background-color: #ffffff;
+    background-image:
+      /* Static linear gradient from white to transparent in the top 30% */
+      linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0) 100%
+      ),
+      /* Animated radial gradients for mesh effect */
+      radial-gradient(at 50% 0%, #ffffff 0%, transparent 70%),
+      radial-gradient(at 80% 50%, #3286E5 0%, transparent 70%),
+      radial-gradient(at 0% 100%, #012854 0%, transparent 70%),
+      radial-gradient(at 80% 100%, #ffffff 0%, transparent 70%),
+      radial-gradient(at 0% 0%, #ffffff 0%, transparent 70%),
+      radial-gradient(at 80% 0%, #ffffff 0%, transparent 70%),
+      radial-gradient(at 0% 50%, #3286E5 0%, transparent 70%);
+    background-size: 200% 200%;
+    background-repeat: no-repeat;
+    animation: gradientAnimation 30s ease infinite;
+  }
+  
+  @keyframes gradientAnimation {
+    0%, 100% {
+      background-position:
+        /* Linear gradient remains static at 0% 0% */
+        0% 0%,
+        /* Radial gradients animate */
+        0% 0%,
+        100% 50%,
+        0% 100%,
+        100% 100%,
+        0% 0%,
+        100% 0%,
+        0% 50%;
+    }
+    14% {
+      background-position:
+        0% 0%,
+        50% 10%,
+        90% 40%,
+        10% 90%,
+        90% 90%,
+        10% 10%,
+        90% 10%,
+        10% 40%;
+    }
+    28% {
+      background-position:
+        0% 0%,
+        0% 20%,
+        80% 30%,
+        20% 80%,
+        80% 80%,
+        20% 20%,
+        80% 20%,
+        20% 30%;
+    }
+    42% {
+      background-position:
+        0% 0%,
+        50% 30%,
+        70% 20%,
+        30% 70%,
+        70% 70%,
+        30% 30%,
+        70% 30%,
+        30% 20%;
+    }
+    57% {
+      background-position:
+        0% 0%,
+        0% 40%,
+        60% 10%,
+        40% 60%,
+        60% 60%,
+        40% 40%,
+        60% 40%,
+        40% 10%;
+    }
+    71% {
+      background-position:
+        0% 0%,
+        50% 50%,
+        50% 0%,
+        50% 50%,
+        50% 50%,
+        50% 50%,
+        50% 0%,
+        50% 50%;
+    }
+    85% {
+      background-position:
+        0% 0%,
+        100% 60%,
+        40% 10%,
+        60% 40%,
+        40% 40%,
+        60% 60%,
+        40% 60%,
+        60% 10%;
+    }
+  }  
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 10s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -150%;
+    }
+    6.25% {
+      left: 150%;
+    }
+    100% {
+      left: 150%;
+    }
+  }
+
 }

@@ -47,6 +47,7 @@ export function useRealtimeClient(
     })
   );
   const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [items, setItems] = useState<ItemType[]>([]);
 
@@ -96,6 +97,7 @@ export function useRealtimeClient(
 
   const connectConversation = useCallback(async () => {
     try {
+      setIsConnecting(true);
       startTimeRef.current = new Date().toISOString();
       await connect();
 
@@ -116,6 +118,8 @@ export function useRealtimeClient(
       console.error('Connection error:', error);
       await disconnectConversation();
       throw error;
+    } finally {
+      setIsConnecting(false);
     }
   }, [connect, disconnectConversation, isMuted, setRealtimeEvents, startTimeRef]);
 
@@ -232,6 +236,7 @@ export function useRealtimeClient(
   return {
     client: clientRef.current,
     isConnected,
+    isConnecting,
     isMuted,
     setIsMuted: setMuted,
     items,

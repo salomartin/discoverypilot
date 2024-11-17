@@ -5,6 +5,6 @@
 }
 
 .bar {
-    stroke: blue;
+    stroke: #3286E5;
     /*  transition: height 0.1s ease, y 0.1s ease, stroke 0.2s ease; Adjusted transition timings */
 }
