@@ -39,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="mesh-gradient">
         {children}
-        <Toaster />
+        <Toaster position="top-center" duration={5000} expand={true} />
         <ScrollRestoration />
         <Scripts />
       </body>

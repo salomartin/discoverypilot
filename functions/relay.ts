@@ -53,7 +53,7 @@ export async function createRealtimeClient(request: Request, apiKey: string) {
       url: OPENAI_URL,
     });
 
-    owrLog("Updating session settings...");
+    owrLog("Updating session settings before connecting");
    
     await realtimeClient.updateSession({
       voice: 'ash',
@@ -64,8 +64,6 @@ export async function createRealtimeClient(request: Request, apiKey: string) {
       },
       // Add any additional server-side session configurations here
     });
-
-    owrLog("Session updated successfully.");
 
     // Add server-side tools
     /*

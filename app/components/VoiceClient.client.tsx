@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { RealtimeEvent } from "../utils/useRealtimeClient.client";
 import { useRealtimeClient } from "../utils/useRealtimeClient.client";
 import { WavRecorder, WavStreamPlayer } from "wavtools";
@@ -9,8 +9,7 @@ import { AGENT_INFO } from "content/frontend";
 import { Button } from "./ui/button";
 import { RealtimeEventsDisplay } from "./RealtimeEventsDisplay";
 import { AudioDeviceControls } from "./AudioDeviceControls";
-import { Alert, AlertDescription } from "./ui/alert";
-import { AlertCircle } from "lucide-react";
+import { toast } from "sonner"
 
 const STORAGE_KEY = "voice_client_memory";
 
@@ -44,12 +43,22 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
     new WavStreamPlayer({ sampleRate: 24000 })
   );
 
+  const handleDisconnect = useCallback((isManualDisconnect: boolean) => {
+    if (!isManualDisconnect) {
+      toast.error(`${AGENT_INFO.SHORT_NAME} has disconnected`, {
+        description: "Please check your connection and try again.",
+        duration: 10000,
+      });
+    }
+  }, []);
+
   const {
     client,
     isConnected,
     isConnecting,
     isMuted,
     setIsMuted,
+    items,
     connectConversation,
     disconnectConversation,
   } = useRealtimeClient(
@@ -83,24 +92,23 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
           setMemoryKv((prev) => ({ ...prev, [key]: value }));
         },
       },
-    ]
+    ],
+    handleDisconnect
   );
 
-  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [showAudioControls, setShowAudioControls] = useState(false);
 
   const handleConnectionToggle = async () => {
     try {
-      setConnectionError(null);
-      if (isConnected) {
-        await disconnectConversation();
-      } else {
+      if (!isConnected) {
         await connectConversation();
       }
-    } catch (error) {
-      setConnectionError(
-        error instanceof Error ? error.message : "Connection failed"
-      );
+    } catch (error) {     
+      toast.error("We can't reach Max at the moment!", {
+        description: "Please try again later.",
+        duration: 5000,
+      });
+      
       console.error("Connection error:", error);
     }
   };
@@ -111,21 +119,6 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
 
   return (
     <div className="w-full max-w-md relative">
-      <AnimatePresence mode="wait">
-        {connectionError && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-0 left-0 right-0 z-50"
-          >
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{connectionError}</AlertDescription>
-            </Alert>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {isConnected && (
         <>
@@ -210,7 +203,7 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
                 className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
-                onClick={handleConnectionToggle}
+                onClick={disconnectConversation}
               >
                 <X className="h-6 w-6" />
               </motion.button>

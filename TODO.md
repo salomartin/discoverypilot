@@ -26,7 +26,12 @@ Add some noise reduction worker & plugin (ie krisp or something open source)
 
 Add some timeout if there too much silence from client side, disconnect and / or pause the session server side to not use openai tokens
 
+On mobile, simplify the mic & speaker selection somehow?
+
 Later
+
+
+fix the bug with clientside tool use and server not allowing sessionupdates
 
 - [ ] Add authentication to the relay endpoint
 - [ ] Add rate limiting

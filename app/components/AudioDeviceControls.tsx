@@ -1,7 +1,8 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Dialog, DialogContent } from "./ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog"
 import { useState, useEffect } from "react"
 import type { WavRecorder, WavStreamPlayer } from "wavtools"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 interface AudioDeviceControlsProps {
   open: boolean;
@@ -125,6 +126,12 @@ export function AudioDeviceControls({
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent className="sm:max-w-[425px] p-0 bg-background border-border">
+        <VisuallyHidden>
+          <DialogTitle>Audio Device Controls</DialogTitle>
+          <DialogDescription id="audio-device-description">
+            Select your preferred microphone and speaker devices
+          </DialogDescription>
+        </VisuallyHidden>
         <div className="flex gap-2 p-4">
           <Select value={selectedMic} onValueChange={handleMicChange}>
             <SelectTrigger className="w-[180px] bg-background border-input">

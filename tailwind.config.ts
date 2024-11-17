@@ -7,8 +7,8 @@ export default {
   	extend: {
   		fontFamily: {
   			sans: [
-  				"Inter",
-  				"ui-sans-serif",
+  				"Montserrat",
+  				"ui-sans-serif", 
   				"system-ui",
   				"sans-serif",
   				"Apple Color Emoji",
