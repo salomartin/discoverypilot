@@ -124,10 +124,10 @@ export default function VoiceClient({ onConnectionChange }: VoiceClientProps) {
         <>
           <VoiceVisualizer wavRef={wavStreamPlayerRef} />
 
-          <RealtimeEventsDisplay
+          {/* <RealtimeEventsDisplay
             events={realtimeEvents}
             startTime={startTimeRef.current}
-          />
+          /> */}
         </>
       )}
 

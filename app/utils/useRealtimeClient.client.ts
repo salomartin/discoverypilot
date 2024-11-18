@@ -46,8 +46,7 @@ export function useRealtimeClient(
 ) {
   const clientRef = useRef<RealtimeClient>(
     new RealtimeClient({
-      url: "http://localhost:5173/relay",
-      debug: true,
+      url: "/relay",
     })
   );
   const [isConnected, setIsConnected] = useState(false);

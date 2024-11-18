@@ -1,27 +1,31 @@
-
 // Server-side tools definition
 export const SERVER_TOOLS = [
     {
       schema: {
-        name: 'log_interaction',
-        description: 'Logs important interactions for analysis',
+        name: 'end_session',
+        description: 'Ends the interview session when all necessary information has been gathered',
         parameters: {
           type: 'object',
           properties: {
-            type: {
+            reason: {
               type: 'string',
-              enum: ['info', 'warning', 'error'],
+              description: 'The reason for ending the session',
             },
-            message: {
+            summary: {
               type: 'string',
+              description: 'Brief summary of the completed interview',
             },
           },
-          required: ['type', 'message'],
+          required: ['reason', 'summary'],
         },
       },
-      fn: async ({ type, message }: { type: string; message: string }) => {
-        console.log(`[${type.toUpperCase()}] ${message}`);
-        return { success: true };
+      fn: async ({ reason, summary }: { reason: string; summary: string }) => {
+        return { 
+          success: true,
+          shouldDisconnect: true,
+          reason,
+          summary 
+        };
       },
     },
-  ];
+];

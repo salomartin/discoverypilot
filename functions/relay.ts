@@ -66,10 +66,51 @@ export async function createRealtimeClient(request: Request, apiKey: string) {
     });
 
     // Add server-side tools
-    /*
     SERVER_TOOLS.forEach(tool => {
-      realtimeClient?.addTool(tool.schema, tool.fn);
-    });*/
+      realtimeClient?.addTool(tool.schema, async (...args) => {
+        const result = await tool.fn(...args);
+        
+        // Check if the tool response indicates we should disconnect
+        if (result?.shouldDisconnect) {
+          owrLog(`Ending session: ${result.reason}`);
+          owrLog(`Interview summary: ${result.summary}`);
+          
+          // Send a final message to the client
+          serverSocket.send(JSON.stringify({
+            type: 'session.end',
+            reason: result.reason,
+            summary: result.summary
+          }));
+
+          // Set a maximum timeout for graceful shutdown
+          const maxTimeout = setTimeout(() => {
+            owrLog('Forcing connection close after timeout');
+            serverSocket.close();
+            realtimeClient?.disconnect();
+          }, 5000);
+
+          // Process any remaining messages before closing
+          const drainQueue = async () => {
+            if (messageQueue.length > 0) {
+              const message = messageQueue.shift();
+              if (message) {
+                await serverSocket.send(message);
+                owrLog("Sent queued message before closing:", message);
+                await drainQueue();
+              }
+            } else {
+              clearTimeout(maxTimeout);
+              serverSocket.close();
+              realtimeClient?.disconnect();
+            }
+          };
+
+          await drainQueue();
+        }
+        
+        return result;
+      });
+    });
 
     owrLog("Connecting to OpenAI Realtime API...");
 

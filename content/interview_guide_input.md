@@ -1,5 +1,4 @@
-
-export const BASE_INSTRUCTIONS = `System settings:
+System settings:
 Tool use: enabled.
 
 # Instructions:
@@ -276,4 +275,3 @@ For each interview, document assumptions in these categories:
 4. Ethical Assumptions
    - "Users understand the value exchange"
    - "The product actually benefits users"
-`;
